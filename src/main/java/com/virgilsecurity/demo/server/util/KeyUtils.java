@@ -31,32 +31,53 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.demo.server.service;
+package com.virgilsecurity.demo.server.util;
 
-import com.virgilsecurity.demo.server.util.JwtGeneratorNexmo;
-import com.virgilsecurity.demo.server.util.NexmoAcl;
+import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateCrtKey;
+import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPublicKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import org.apache.tomcat.util.codec.binary.Base64;
 
 /**
- * NexmoService class.
+ * KeyUtils class.
  */
-@Service
-public class NexmoService {
+class KeyUtils {
 
-    @Autowired
-    JwtGeneratorNexmo jwtGeneratorNexmo;
+  static PrivateKey importPrivateKey(String privateKeyB64)
+      throws InvalidKeySpecException, NoSuchAlgorithmException {
 
-    public String generateNexmoToken(String identity) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        List<NexmoAcl> aclList = new ArrayList<>(2);
-        aclList.add(NexmoAcl.SESSIONS);
-        aclList.add(NexmoAcl.CONVERSATIONS);
-        aclList.add(NexmoAcl.USERS);
+    KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+    byte[] keyBytes = Base64.decodeBase64(privateKeyB64);
+    EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
 
-        return jwtGeneratorNexmo.generate(identity, aclList);
-    }
+    return keyFactory.generatePrivate(keySpec);
+  }
+
+  static PublicKey importPublicKey(String publicKeyB64)
+      throws InvalidKeySpecException, NoSuchAlgorithmException {
+
+    KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+    byte[] keyBytes = Base64.decodeBase64(publicKeyB64);
+    X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+
+    return keyFactory.generatePublic(keySpec);
+  }
+
+  static PublicKey extractPublicKey(PrivateKey privateKey) throws
+      NoSuchAlgorithmException, InvalidKeySpecException {
+
+    RSAPrivateCrtKey privateKeyRsaCert = (RSAPrivateCrtKey) privateKey;
+    RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(privateKeyRsaCert.getModulus(),
+                                                          privateKeyRsaCert.getPublicExponent());
+    KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+
+    return keyFactory.generatePublic(publicKeySpec);
+  }
 }

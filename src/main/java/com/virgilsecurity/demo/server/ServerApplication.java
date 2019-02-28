@@ -34,6 +34,7 @@
 package com.virgilsecurity.demo.server;
 
 import com.virgilsecurity.demo.server.util.JwtGeneratorNexmo;
+import com.virgilsecurity.demo.server.util.JwtVerifierNexmo;
 import com.virgilsecurity.sdk.common.TimeSpan;
 import com.virgilsecurity.sdk.crypto.AccessTokenSigner;
 import com.virgilsecurity.sdk.crypto.PrivateKey;
@@ -86,5 +87,10 @@ public class ServerApplication {
         return new JwtGeneratorNexmo(nexmoSecretKey,
                                      nexmoAppId,
                                      TimeSpan.fromTime(2, TimeUnit.HOURS));
+    }
+
+    @Bean
+    public JwtVerifierNexmo jwtVerifierNexmo() {
+        return new JwtVerifierNexmo(nexmoSecretKey);
     }
 }

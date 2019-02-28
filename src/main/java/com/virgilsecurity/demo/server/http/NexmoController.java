@@ -36,6 +36,7 @@ package com.virgilsecurity.demo.server.http;
 import com.virgilsecurity.demo.server.model.NexmoTokenResponse;
 import com.virgilsecurity.demo.server.service.AuthenticationService;
 import com.virgilsecurity.demo.server.service.NexmoService;
+import com.virgilsecurity.demo.server.util.JwtVerifierNexmo;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,8 @@ public class NexmoController {
     NexmoService nexmoService;
     @Autowired
     AuthenticationService authService;
+    @Autowired
+    JwtVerifierNexmo jwtVerifierNexmo;
 
     @RequestMapping("/nexmo-jwt")
     public ResponseEntity<NexmoTokenResponse> getNexmoToken(
@@ -65,6 +68,10 @@ public class NexmoController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
         String token = nexmoService.generateNexmoToken(identity);
+
+        if (!jwtVerifierNexmo.verify(token))
+            throw new IllegalStateException("Sorry, I've generated bad token.");
+
         return new ResponseEntity<>(new NexmoTokenResponse(token), HttpStatus.OK);
     }
 }

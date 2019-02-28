@@ -31,32 +31,46 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.demo.server.service;
+package com.virgilsecurity.demo.server.util;
 
-import com.virgilsecurity.demo.server.util.JwtGeneratorNexmo;
-import com.virgilsecurity.demo.server.util.NexmoAcl;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 /**
- * NexmoService class.
+ * JwtVerifierNexmo class.
  */
-@Service
-public class NexmoService {
+public class JwtVerifierNexmo {
 
-    @Autowired
-    JwtGeneratorNexmo jwtGeneratorNexmo;
+  private final JWTVerifier verifier;
 
-    public String generateNexmoToken(String identity) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        List<NexmoAcl> aclList = new ArrayList<>(2);
-        aclList.add(NexmoAcl.SESSIONS);
-        aclList.add(NexmoAcl.CONVERSATIONS);
-        aclList.add(NexmoAcl.USERS);
-
-        return jwtGeneratorNexmo.generate(identity, aclList);
+  public JwtVerifierNexmo(String secretKeyBase64) {
+    PrivateKey privateKey;
+    PublicKey publicKey;
+    try {
+      privateKey = KeyUtils.importPrivateKey(secretKeyBase64);
+      publicKey = KeyUtils.extractPublicKey(privateKey);
+    } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+      throw new IllegalStateException("Check your private key");
     }
+
+    Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) publicKey, (RSAPrivateKey) privateKey);
+    verifier = JWT.require(algorithm).build();
+  }
+
+  public boolean verify(String token) {
+    try {
+      verifier.verify(token);
+      return true;
+    } catch (JWTVerificationException exception) {
+      return false;
+    }
+  }
 }

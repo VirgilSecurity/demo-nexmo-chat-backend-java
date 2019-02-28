@@ -35,17 +35,14 @@ package com.virgilsecurity.demo.server.util;
 
 import com.auth0.jwt.algorithms.Algorithm;
 import com.virgilsecurity.sdk.common.TimeSpan;
-import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import org.apache.tomcat.util.codec.binary.Base64;
 
 /**
  * JwtGeneratorNexmo class.
@@ -57,7 +54,7 @@ public class JwtGeneratorNexmo {
     private static final String ISSUED_AT = "iat";
     private static final String JWT_ID = "jti";
     private static final String SUBJECT = "sub";
-    private static final String EXPITAION = "exp";
+    private static final String EXPIRATION = "exp";
     private static final String ACL = "acl";
     private static final String PATHS = "paths";
     private static final String APP_ID = "application_id";
@@ -77,10 +74,7 @@ public class JwtGeneratorNexmo {
 
     public String generate(String identity,
                            List<NexmoAcl> acls) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        KeyFactory kf = KeyFactory.getInstance("RSA");
-        byte[] keyBytes = Base64.getDecoder().decode(secretKey);
-        EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-        PrivateKey privateKey = kf.generatePrivate(keySpec);
+        PrivateKey privateKey = KeyUtils.importPrivateKey(secretKey);
 
         Algorithm algorithm = Algorithm.RSA256(null, (RSAPrivateKey) privateKey);
 
@@ -112,17 +106,16 @@ public class JwtGeneratorNexmo {
                 "  \"" + ISSUED_AT + "\": " + issuedAt + ",\n" +
                 "  \"" + JWT_ID + "\": \"" + UUID.randomUUID().toString() + "\",\n" +
                 "  \"" + SUBJECT + "\": \"" + identity + "\",\n" +
-                "  \"" + EXPITAION + "\": \"" + expiresAt + "\",\n" +
+                "  \"" + EXPIRATION + "\": " + expiresAt + ",\n" +
                 aclBuilder.toString() +
                 "  \"" + APP_ID + "\": \"" + appId + "\"\n" +
                 "}";
 
-
-        String headerEncoded = org.apache.tomcat.util.codec.binary.Base64.encodeBase64String(headerJson.getBytes());
-        String payloadEncoded = org.apache.tomcat.util.codec.binary.Base64.encodeBase64String(payloadJson.getBytes());
+        String headerEncoded = Base64.encodeBase64String(headerJson.getBytes());
+        String payloadEncoded = Base64.encodeBase64String(payloadJson.getBytes());
 
         byte[] signatureBytes = algorithm.sign(headerEncoded.getBytes(), payloadEncoded.getBytes());
-        String signature = org.apache.tomcat.util.codec.binary.Base64.encodeBase64String(signatureBytes);
+        String signature = Base64.encodeBase64String(signatureBytes);
 
         return String.format("%s.%s.%s", headerEncoded, payloadEncoded, signature);
     }
