@@ -31,24 +31,25 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.demo.server.model;
+package com.virgilsecurity.demo.server.model.response;
 
-public class NexmoTokenResponse {
+public class VirgilTokenResponse {
 
-  private String nexmoToken;
+  private String virgilToken;
 
-  public NexmoTokenResponse() {
+  public VirgilTokenResponse() {
   }
 
-  public NexmoTokenResponse(String nexmoToken) {
-    this.nexmoToken = nexmoToken;
+  public VirgilTokenResponse(String virgilToken) {
+    this.virgilToken = virgilToken;
   }
 
-  public String getNexmoToken() {
-    return nexmoToken;
+  public String getVirgilToken() {
+    return virgilToken;
   }
 
-  public void setNexmoToken(String nexmoToken) {
-    this.nexmoToken = nexmoToken;
+  public void setVirgilToken(String virgilToken) {
+    this.virgilToken = virgilToken;
   }
+
 }

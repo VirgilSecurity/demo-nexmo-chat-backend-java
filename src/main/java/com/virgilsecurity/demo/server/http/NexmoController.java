@@ -33,7 +33,11 @@
 
 package com.virgilsecurity.demo.server.http;
 
-import com.virgilsecurity.demo.server.model.NexmoTokenResponse;
+import com.virgilsecurity.demo.server.model.request.AuthRequest;
+import com.virgilsecurity.demo.server.model.request.CreateUserRequest;
+import com.virgilsecurity.demo.server.model.response.AuthResponse;
+import com.virgilsecurity.demo.server.model.response.CreateUserResponse;
+import com.virgilsecurity.demo.server.model.response.NexmoTokenResponse;
 import com.virgilsecurity.demo.server.service.AuthenticationService;
 import com.virgilsecurity.demo.server.service.NexmoService;
 import com.virgilsecurity.demo.server.util.JwtVerifierNexmo;
@@ -42,6 +46,8 @@ import java.security.spec.InvalidKeySpecException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,7 +65,7 @@ public class NexmoController {
     @Autowired
     JwtVerifierNexmo jwtVerifierNexmo;
 
-    @RequestMapping("/nexmo-jwt")
+    @RequestMapping("/auth/nexmo-jwt")
     public ResponseEntity<NexmoTokenResponse> getNexmoToken(
             @RequestHeader(name = "Authorization", required = false)
                     String authToken) throws InvalidKeySpecException, NoSuchAlgorithmException {
@@ -73,5 +79,13 @@ public class NexmoController {
             throw new IllegalStateException("Sorry, I've generated bad token.");
 
         return new ResponseEntity<>(new NexmoTokenResponse(token), HttpStatus.OK);
+    }
+
+    @PostMapping
+    @RequestMapping("/users/create")
+    public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest authRequest) {
+        CreateUserResponse response = nexmoService.createUser(authRequest.getName(),
+                                                               authRequest.getDisplayName());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

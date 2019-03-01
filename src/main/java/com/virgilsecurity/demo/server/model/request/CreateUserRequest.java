@@ -31,45 +31,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.demo.server.service;
+package com.virgilsecurity.demo.server.model.request;
 
-import com.virgilsecurity.demo.server.model.request.CreateUserRequest;
-import com.virgilsecurity.demo.server.model.response.CreateUserResponse;
-import com.virgilsecurity.demo.server.util.JwtGeneratorNexmo;
-import com.virgilsecurity.demo.server.util.NexmoAcl;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * NexmoService class.
+ * AuthRequest class.
  */
-@Service
-public class NexmoService {
+public class CreateUserRequest {
 
-  private static final String BASE_URL = "https://api.nexmo.com/beta";
-  private static final String USERS = "/users";
+  private String name;
 
-  @Autowired
-  JwtGeneratorNexmo jwtGeneratorNexmo;
+  @JsonProperty("display_name")
+  private String displayName;
 
-  public String generateNexmoToken(String identity) throws InvalidKeySpecException, NoSuchAlgorithmException {
-    List<NexmoAcl> aclList = new ArrayList<>(2);
-    aclList.add(NexmoAcl.SESSIONS);
-    aclList.add(NexmoAcl.CONVERSATIONS);
-    aclList.add(NexmoAcl.USERS);
-
-    return jwtGeneratorNexmo.generate(identity, aclList);
+  public CreateUserRequest() {
   }
 
-  public CreateUserResponse createUser(String name, String displayName) {
-    CreateUserRequest newEmployee = new CreateUserRequest(name, displayName);
-    RestTemplate restTemplate = new RestTemplate();
+  public CreateUserRequest(String name, String displayName) {
+    this.name = name;
+    this.displayName = displayName;
+  }
 
-    return restTemplate.postForObject(BASE_URL + USERS, newEmployee, CreateUserResponse.class);
+  public String getName() {
+    return name;
+  }
+
+  public String getDisplayName() {
+    return displayName;
   }
 }

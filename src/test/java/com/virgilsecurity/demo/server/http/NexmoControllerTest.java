@@ -36,9 +36,11 @@ package com.virgilsecurity.demo.server.http;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import com.virgilsecurity.demo.server.model.AuthRequest;
-import com.virgilsecurity.demo.server.model.AuthResponse;
-import com.virgilsecurity.demo.server.model.NexmoTokenResponse;
+import com.virgilsecurity.demo.server.model.request.AuthRequest;
+import com.virgilsecurity.demo.server.model.request.CreateUserRequest;
+import com.virgilsecurity.demo.server.model.response.AuthResponse;
+import com.virgilsecurity.demo.server.model.response.CreateUserResponse;
+import com.virgilsecurity.demo.server.model.response.NexmoTokenResponse;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
@@ -79,7 +81,10 @@ public class NexmoControllerTest {
 
     @Test
     public void get_nexmo_jwt_no_login() {
-        URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/nexmo-jwt").build().encode().toUri();
+        URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/auth/nexmo-jwt")
+                                      .build()
+                                      .encode()
+                                      .toUri();
         HttpEntity<?> requestEntity = new HttpEntity<>(new HttpHeaders());
         ResponseEntity<NexmoTokenResponse> responseEntity = this.restTemplate.exchange(uri,
                                                                                        HttpMethod.GET,
@@ -91,7 +96,7 @@ public class NexmoControllerTest {
 
     @Test
     public void generateToken() throws URISyntaxException {
-        final String baseUrl = "http://localhost:" + port + "/authenticate";
+        final String baseUrl = "http://localhost:" + port + "/auth/authenticate";
         URI uri = new URI(baseUrl);
         AuthRequest authRequest = new AuthRequest(identity);
 
@@ -102,20 +107,74 @@ public class NexmoControllerTest {
         assertEquals(200, response.getStatusCodeValue());
         String authToken = response.getBody().getAuthToken();
 
-        uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/nexmo-jwt").build()
-                                  .encode().toUri();
+        URI uriNexmoJwt = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/auth/nexmo-jwt")
+                                              .build()
+                                              .encode().toUri();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + authToken);
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
-        ResponseEntity<NexmoTokenResponse> responseEntity = this.restTemplate.exchange(uri,
+        ResponseEntity<NexmoTokenResponse> responseEntity = this.restTemplate.exchange(uriNexmoJwt,
                                                                                        HttpMethod.GET,
                                                                                        requestEntity,
                                                                                        NexmoTokenResponse.class);
         assertNotNull(responseEntity);
         assertEquals(200, responseEntity.getStatusCode().value());
 
-        NexmoTokenResponse virgilTokenResponse = responseEntity.getBody();
-        assertNotNull(virgilTokenResponse);
-        assertNotNull(virgilTokenResponse.getNexmoToken());
+        NexmoTokenResponse nexmoTokenResponse = responseEntity.getBody();
+        assertNotNull(nexmoTokenResponse);
+        assertNotNull(nexmoTokenResponse.getNexmoToken());
+    }
+
+    @Test
+    public void createUser() throws URISyntaxException {
+        final String baseUrl = "http://localhost:" + port + "/auth/authenticate";
+        URI uri = new URI(baseUrl);
+        AuthRequest authRequest = new AuthRequest(identity);
+
+        HttpEntity<AuthRequest> request = new HttpEntity<>(authRequest);
+
+        ResponseEntity<AuthResponse> response = restTemplate.postForEntity(uri,
+                                                                           request,
+                                                                           AuthResponse.class);
+
+        assertEquals(200, response.getStatusCodeValue());
+        String authToken = response.getBody().getAuthToken();
+
+        URI uriNexmoJwt = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/auth/nexmo-jwt")
+                                              .build()
+                                              .encode().toUri();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + authToken);
+        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+        ResponseEntity<NexmoTokenResponse> responseEntity = this.restTemplate.exchange(uriNexmoJwt,
+                                                                                       HttpMethod.GET,
+                                                                                       requestEntity,
+                                                                                       NexmoTokenResponse.class);
+        assertNotNull(responseEntity);
+        assertEquals(200, responseEntity.getStatusCode().value());
+
+        NexmoTokenResponse nexmoTokenResponse = responseEntity.getBody();
+        assertNotNull(nexmoTokenResponse);
+        assertNotNull(nexmoTokenResponse.getNexmoToken());
+
+        URI uriCreateUser = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/users/create")
+                                                .build()
+                                                .encode()
+                                                .toUri();
+        HttpHeaders headersCreateUser = new HttpHeaders();
+        headersCreateUser.add("Authorization", "Bearer " + nexmoTokenResponse.getNexmoToken());
+        String username = UUID.randomUUID().toString();
+        CreateUserRequest createUserRequest = new CreateUserRequest(username, username + "display");
+        HttpEntity<CreateUserRequest> requestEntityCreateUser = new HttpEntity<>(createUserRequest,
+                                                                                 headersCreateUser);
+
+        ResponseEntity<CreateUserResponse> responseCreateUser = restTemplate.postForEntity(uriCreateUser,
+                                                                                           requestEntityCreateUser,
+                                                                                           CreateUserResponse.class);
+
+        assertEquals(200, responseCreateUser.getStatusCodeValue());
+        CreateUserResponse createUserResult = responseCreateUser.getBody();
+        assertNotNull(createUserResult);
+        assertEquals(username, createUserResult.getName());
     }
 }

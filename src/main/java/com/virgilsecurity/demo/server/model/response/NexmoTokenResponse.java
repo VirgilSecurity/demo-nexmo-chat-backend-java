@@ -31,27 +31,24 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.demo.server.model;
+package com.virgilsecurity.demo.server.model.response;
 
-/**
- * AuthResponse class.
- */
-public class AuthResponse {
+public class NexmoTokenResponse {
 
-    private String authToken;
+  private String nexmoToken;
 
-    public AuthResponse() {
-    }
+  public NexmoTokenResponse() {
+  }
 
-    public AuthResponse(String authToken) {
-        this.authToken = authToken;
-    }
+  public NexmoTokenResponse(String nexmoToken) {
+    this.nexmoToken = nexmoToken;
+  }
 
-    public String getAuthToken() {
-        return authToken;
-    }
+  public String getNexmoToken() {
+    return nexmoToken;
+  }
 
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
-    }
+  public void setNexmoToken(String nexmoToken) {
+    this.nexmoToken = nexmoToken;
+  }
 }

@@ -42,7 +42,7 @@ package com.virgilsecurity.demo.server.http;/**
  * ....|_|-
  */
 
-import com.virgilsecurity.demo.server.model.VirgilTokenResponse;
+import com.virgilsecurity.demo.server.model.response.VirgilTokenResponse;
 import com.virgilsecurity.demo.server.service.AuthenticationService;
 import com.virgilsecurity.demo.server.service.VirgilService;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
@@ -65,7 +65,7 @@ public class VirgilController {
     @Autowired
     AuthenticationService authService;
 
-    @RequestMapping("/virgil-jwt")
+    @RequestMapping("/auth/virgil-jwt")
     public ResponseEntity<VirgilTokenResponse> getVirgilToken(
             @RequestHeader(name = "Authorization", required = false) String authToken)
             throws CryptoException {

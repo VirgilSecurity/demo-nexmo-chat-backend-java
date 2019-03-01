@@ -37,9 +37,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import com.virgilsecurity.demo.server.model.AuthRequest;
-import com.virgilsecurity.demo.server.model.AuthResponse;
-import com.virgilsecurity.demo.server.model.VirgilTokenResponse;
+import com.virgilsecurity.demo.server.model.request.AuthRequest;
+import com.virgilsecurity.demo.server.model.response.AuthResponse;
+import com.virgilsecurity.demo.server.model.response.VirgilTokenResponse;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
@@ -77,7 +77,7 @@ public class AuthenticationControllerTest {
 
     @Test
     public void login() throws URISyntaxException {
-        final String baseUrl = "http://localhost:" + port + "/authenticate";
+        final String baseUrl = "http://localhost:" + port + "/auth/authenticate";
         URI uri = new URI(baseUrl);
         AuthRequest authRequest = new AuthRequest(identity);
 
@@ -93,7 +93,7 @@ public class AuthenticationControllerTest {
 
     @Test
     public void generateToken_noLogin() {
-        URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/virgil-jwt").build().encode().toUri();
+        URI uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/auth/virgil-jwt").build().encode().toUri();
         HttpEntity<?> requestEntity = new HttpEntity<>(new HttpHeaders());
         ResponseEntity<VirgilTokenResponse> responseEntity = this.restTemplate.exchange(uri,
                                                                                         HttpMethod.GET,
@@ -105,7 +105,7 @@ public class AuthenticationControllerTest {
 
     @Test
     public void generateToken() throws URISyntaxException {
-        final String baseUrl = "http://localhost:" + port + "/authenticate";
+        final String baseUrl = "http://localhost:" + port + "/auth/authenticate";
         URI uri = new URI(baseUrl);
         AuthRequest authRequest = new AuthRequest(identity);
 
@@ -116,7 +116,7 @@ public class AuthenticationControllerTest {
         assertEquals(200, response.getStatusCodeValue());
         String authToken = response.getBody().getAuthToken();
 
-        uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/virgil-jwt").build()
+        uri = UriComponentsBuilder.fromHttpUrl("http://localhost:" + port + "/auth/virgil-jwt").build()
                                   .encode().toUri();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + authToken);

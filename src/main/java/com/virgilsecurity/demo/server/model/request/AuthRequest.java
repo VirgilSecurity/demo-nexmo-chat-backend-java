@@ -31,25 +31,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.demo.server.model;
+package com.virgilsecurity.demo.server.model.request;
 
-public class VirgilTokenResponse {
+/**
+ * AuthRequest class.
+ */
+public class AuthRequest {
 
-  private String virgilToken;
+    private String identity;
 
-  public VirgilTokenResponse() {
-  }
+    public AuthRequest() {
+    }
 
-  public VirgilTokenResponse(String virgilToken) {
-    this.virgilToken = virgilToken;
-  }
+    public AuthRequest(String identity) {
+        this.identity = identity;
+    }
 
-  public String getVirgilToken() {
-    return virgilToken;
-  }
+    public String getIdentity() {
+        return identity;
+    }
 
-  public void setVirgilToken(String virgilToken) {
-    this.virgilToken = virgilToken;
-  }
-
+    public void setIdentity(String identity) {
+        this.identity = identity;
+    }
 }

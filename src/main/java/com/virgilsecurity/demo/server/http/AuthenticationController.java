@@ -33,8 +33,8 @@
 
 package com.virgilsecurity.demo.server.http;
 
-import com.virgilsecurity.demo.server.model.AuthRequest;
-import com.virgilsecurity.demo.server.model.AuthResponse;
+import com.virgilsecurity.demo.server.model.request.AuthRequest;
+import com.virgilsecurity.demo.server.model.response.AuthResponse;
 import com.virgilsecurity.demo.server.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,7 +51,7 @@ public class AuthenticationController {
   AuthenticationService authService;
 
   @PostMapping
-  @RequestMapping("/authenticate")
+  @RequestMapping("/auth/authenticate")
   public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
     String authToken = authService.login(authRequest.getIdentity());
     return new ResponseEntity<>(new AuthResponse(authToken), HttpStatus.OK);

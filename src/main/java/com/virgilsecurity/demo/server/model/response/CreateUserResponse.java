@@ -31,27 +31,33 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.demo.server.model;
+package com.virgilsecurity.demo.server.model.response;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * AuthRequest class.
  */
-public class AuthRequest {
+public class CreateUserResponse {
 
-    private String identity;
+  private String name;
 
-    public AuthRequest() {
-    }
+  @JsonProperty("display_name")
+  private String displayName;
 
-    public AuthRequest(String identity) {
-        this.identity = identity;
-    }
+  public CreateUserResponse() {
+  }
 
-    public String getIdentity() {
-        return identity;
-    }
+  public CreateUserResponse(String name, String displayName) {
+    this.name = name;
+    this.displayName = displayName;
+  }
 
-    public void setIdentity(String identity) {
-        this.identity = identity;
-    }
+  public String getName() {
+    return name;
+  }
+
+  public String getDisplayName() {
+    return displayName;
+  }
 }
