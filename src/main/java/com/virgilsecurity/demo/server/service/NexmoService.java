@@ -62,10 +62,9 @@ public class NexmoService {
 
   public String generateNexmoToken(String identity) throws GeneralSecurityException, IOException {
     List<NexmoAcl> aclList = new ArrayList<>(2);
-//    aclList.add(NexmoAcl.SESSIONS);
-//    aclList.add(NexmoAcl.CONVERSATIONS);
-//    aclList.add(NexmoAcl.USERS);
-    aclList.add(NexmoAcl.ADMIN);
+    aclList.add(NexmoAcl.SESSIONS);
+    aclList.add(NexmoAcl.CONVERSATIONS);
+    aclList.add(NexmoAcl.USERS);
 
     return jwtGeneratorNexmo.generate(identity, aclList);
   }

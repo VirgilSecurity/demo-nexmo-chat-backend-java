@@ -78,35 +78,33 @@ public class JwtGeneratorNexmo {
         String expiresAt = String.valueOf((now.getTime() / 1000) + ttl.getSpanSeconds());
 
         StringBuilder aclBuilder = new StringBuilder();
-        aclBuilder.append("  \"" + ACL+ "\": {\n");
-        aclBuilder.append("    \"" + PATHS + "\": {\n");
+        aclBuilder.append("\"" + ACL + "\":{");
+        aclBuilder.append("\"" + PATHS + "\":{");
         for (int i = 0; i < acls.size(); i++) {
             aclBuilder.append(acls.get(i).toString());
 
             if (i < acls.size() - 1)
                 aclBuilder.append(','); // Do not add comma on the last line
-
-            aclBuilder.append('\n');
         }
-        aclBuilder.append("    }\n");
-        aclBuilder.append("  },\n");
+        aclBuilder.append("}");
+        aclBuilder.append("},");
 
-        String headerJson = "{\n" +
-                "  \"" + TYPE + "\": \"" + TYPE_JWT + "\",\n" +
-                "  \"" + ALGORITHM + "\": \"" + ALGORITHM_RS256 + "\"\n" +
+        String headerJson = "{" +
+            "\"" + TYPE + "\":\"" + TYPE_JWT + "\"," +
+            "\"" + ALGORITHM + "\":\"" + ALGORITHM_RS256 + "\"" +
                 "}";
 
-        String payloadJson = "{\n" +
-                "  \"" + ISSUED_AT + "\": " + issuedAt + ",\n" +
-                "  \"" + JWT_ID + "\": \"" + UUID.randomUUID().toString() + "\",\n" +
-                "  \"" + SUBJECT + "\": \"" + identity + "\",\n" +
-                "  \"" + EXPIRATION + "\": " + expiresAt + ",\n" +
+        String payloadJson = "{" +
+            "\"" + ISSUED_AT + "\":" + issuedAt + "," +
+            "\"" + JWT_ID + "\":\"" + UUID.randomUUID().toString() + "\"," +
+            "\"" + SUBJECT + "\":\"" + identity + "\"," +
+            "\"" + EXPIRATION + "\": " + expiresAt + "," +
                 aclBuilder.toString() +
-                "  \"" + APP_ID + "\": \"" + appId + "\"\n" +
+            "\"" + APP_ID + "\":\"" + appId + "\"" +
                 "}";
 
-        String headerEncoded = Base64.encodeBase64String(headerJson.getBytes());
-        String payloadEncoded = Base64.encodeBase64String(payloadJson.getBytes());
+        String headerEncoded = Base64.encodeBase64URLSafeString(headerJson.getBytes());
+        String payloadEncoded = Base64.encodeBase64URLSafeString(payloadJson.getBytes());
 
         RSAPrivateKey privateKey = KeyUtils.getPrivateKey(secretKeyPath);
         String signature = KeyUtils.sign(privateKey, headerEncoded + "." + payloadEncoded);

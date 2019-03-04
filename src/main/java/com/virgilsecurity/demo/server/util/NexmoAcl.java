@@ -38,23 +38,22 @@ package com.virgilsecurity.demo.server.util;
  */
 public enum NexmoAcl {
 
-    USERS("\"/v1/users/**\": {}"),
-    CONVERSATIONS("\"/v1/conversations/**\": {}"),
-    SESSIONS("\"/v1/sessions/**\": {}"),
-    DEVICES("\"/v1/devices/**\": {}"),
-    IMAGE("\"/v1/image/**\": {}"),
-    MEDIA("\"/v1/media/**\": {}"),
-    APPLIACTIONS("\"/v1/applications/**\": {}"),
-    PUSH("\"/v1/push/**\": {}"),
-    KNOCKING("\"/v1/knocking/**\": {}"),
-    ADMIN("\"/**\": {}");
+    USERS("\"/v1/users/**\":{}"),
+    CONVERSATIONS("\"/v1/conversations/**\":{}"),
+    SESSIONS("\"/v1/sessions/**\":{}"),
+    DEVICES("\"/v1/devices/**\":{}"),
+    IMAGE("\"/v1/image/**\":{}"),
+    MEDIA("\"/v1/media/**\":{}"),
+    APPLIACTIONS("\"/v1/applications/**\":{}"),
+    PUSH("\"/v1/push/**\":{}"),
+    KNOCKING("\"/v1/knocking/**\":{}"),
+    ADMIN("\"/**\":{}");
 
     private final String acl;
 
     private NexmoAcl(String acl) {
         this.acl = acl;
     }
-
 
     public boolean equalsName(String otherAcl) {
         // (otherName == null) check is not needed because name.equals(null) returns false
