@@ -98,6 +98,7 @@ public class NexmoControllerTest {
     public void generateToken() throws URISyntaxException {
         final String baseUrl = "http://localhost:" + port + "/auth/authenticate";
         URI uri = new URI(baseUrl);
+        identity = "jamie";
         AuthRequest authRequest = new AuthRequest(identity);
 
         HttpEntity<AuthRequest> request = new HttpEntity<>(authRequest);

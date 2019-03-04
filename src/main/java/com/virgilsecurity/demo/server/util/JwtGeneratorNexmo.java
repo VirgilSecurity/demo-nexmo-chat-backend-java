@@ -33,12 +33,10 @@
 
 package com.virgilsecurity.demo.server.util;
 
-import com.auth0.jwt.algorithms.Algorithm;
 import com.virgilsecurity.sdk.common.TimeSpan;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -62,22 +60,18 @@ public class JwtGeneratorNexmo {
     private static final String TYPE_JWT = "JWT";
     private static final String ALGORITHM_RS256 = "RS256";
 
-    private final String secretKey;
+    private final String secretKeyPath;
     private final String appId;
     private final TimeSpan ttl;
 
-    public JwtGeneratorNexmo(String secretKey, String appId, TimeSpan ttl) {
-        this.secretKey = secretKey;
+    public JwtGeneratorNexmo(String secretKeyPath, String appId, TimeSpan ttl) {
+        this.secretKeyPath = secretKeyPath;
         this.appId = appId;
         this.ttl = ttl;
     }
 
     public String generate(String identity,
-                           List<NexmoAcl> acls) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        PrivateKey privateKey = KeyUtils.importPrivateKey(secretKey);
-
-        Algorithm algorithm = Algorithm.RSA256(null, (RSAPrivateKey) privateKey);
-
+                           List<NexmoAcl> acls) throws GeneralSecurityException, IOException {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
         String issuedAt = String.valueOf(now.getTime() / 1000);
@@ -114,8 +108,8 @@ public class JwtGeneratorNexmo {
         String headerEncoded = Base64.encodeBase64String(headerJson.getBytes());
         String payloadEncoded = Base64.encodeBase64String(payloadJson.getBytes());
 
-        byte[] signatureBytes = algorithm.sign(headerEncoded.getBytes(), payloadEncoded.getBytes());
-        String signature = Base64.encodeBase64String(signatureBytes);
+        RSAPrivateKey privateKey = KeyUtils.getPrivateKey(secretKeyPath);
+        String signature = KeyUtils.sign(privateKey, headerEncoded + "." + payloadEncoded);
 
         return String.format("%s.%s.%s", headerEncoded, payloadEncoded, signature);
     }

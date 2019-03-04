@@ -33,15 +33,16 @@
 
 package com.virgilsecurity.demo.server.http;
 
-import com.virgilsecurity.demo.server.model.request.AuthRequest;
 import com.virgilsecurity.demo.server.model.request.CreateUserRequest;
-import com.virgilsecurity.demo.server.model.response.AuthResponse;
 import com.virgilsecurity.demo.server.model.response.CreateUserResponse;
 import com.virgilsecurity.demo.server.model.response.NexmoTokenResponse;
 import com.virgilsecurity.demo.server.service.AuthenticationService;
 import com.virgilsecurity.demo.server.service.NexmoService;
 import com.virgilsecurity.demo.server.util.JwtVerifierNexmo;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,7 +69,7 @@ public class NexmoController {
     @RequestMapping("/auth/nexmo-jwt")
     public ResponseEntity<NexmoTokenResponse> getNexmoToken(
             @RequestHeader(name = "Authorization", required = false)
-                    String authToken) throws InvalidKeySpecException, NoSuchAlgorithmException {
+                String authToken) throws GeneralSecurityException, IOException {
         String identity = authService.getIdentity(authToken);
         if (identity == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);

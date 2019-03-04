@@ -33,44 +33,31 @@
 
 package com.virgilsecurity.demo.server.util;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
+import java.io.IOException;
+import java.security.*;
 
 /**
  * JwtVerifierNexmo class.
  */
 public class JwtVerifierNexmo {
 
-  private final JWTVerifier verifier;
+  private final PublicKey publicKey;
 
-  public JwtVerifierNexmo(String secretKeyBase64) {
-    PrivateKey privateKey;
-    PublicKey publicKey;
+  public JwtVerifierNexmo(String secretKeyPath) {
     try {
-      privateKey = KeyUtils.importPrivateKey(secretKeyBase64);
+      PrivateKey privateKey = KeyUtils.getPrivateKey(secretKeyPath);
       publicKey = KeyUtils.extractPublicKey(privateKey);
-    } catch (InvalidKeySpecException | NoSuchAlgorithmException e) {
+    } catch (IOException | GeneralSecurityException e) {
       throw new IllegalStateException("Check your private key");
     }
-
-    Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) publicKey, (RSAPrivateKey) privateKey);
-    verifier = JWT.require(algorithm).build();
   }
 
   public boolean verify(String token) {
     try {
-      verifier.verify(token);
-      return true;
-    } catch (JWTVerificationException exception) {
-      return false;
+      String[] tokenParts = token.split("\\.");
+      return KeyUtils.verify(publicKey, tokenParts[0] + "." + tokenParts[1], tokenParts[2]);
+    } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException exception) {
+      throw new IllegalStateException("Exception while verifying token");
     }
   }
 }

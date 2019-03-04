@@ -43,6 +43,8 @@ import com.virgilsecurity.sdk.crypto.VirgilCrypto;
 import com.virgilsecurity.sdk.crypto.exceptions.CryptoException;
 import com.virgilsecurity.sdk.jwt.JwtGenerator;
 import com.virgilsecurity.sdk.utils.ConvertionUtils;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -52,6 +54,8 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class ServerApplication {
 
+    private static final String PRIVATE_KEY_PATH = "src/main/resources/virgilnexmodemo_private.key";
+
     @Value("${virgil.app.id}")
     String appId;
 
@@ -60,9 +64,6 @@ public class ServerApplication {
 
     @Value("${virgil.api.public_key_id}")
     String apiKeyIdentifier;
-
-    @Value("${nexmo.api.secret_key}")
-    String nexmoSecretKey;
 
     @Value("${nexmo.api.app_id}")
     String nexmoAppId;
@@ -84,13 +85,13 @@ public class ServerApplication {
     @Bean
     public JwtGeneratorNexmo jwtGeneratorNexmo() {
 
-        return new JwtGeneratorNexmo(nexmoSecretKey,
+        return new JwtGeneratorNexmo(PRIVATE_KEY_PATH,
                                      nexmoAppId,
                                      TimeSpan.fromTime(2, TimeUnit.HOURS));
     }
 
     @Bean
-    public JwtVerifierNexmo jwtVerifierNexmo() {
-        return new JwtVerifierNexmo(nexmoSecretKey);
+    public JwtVerifierNexmo jwtVerifierNexmo() throws NoSuchProviderException, NoSuchAlgorithmException {
+        return new JwtVerifierNexmo(PRIVATE_KEY_PATH);
     }
 }

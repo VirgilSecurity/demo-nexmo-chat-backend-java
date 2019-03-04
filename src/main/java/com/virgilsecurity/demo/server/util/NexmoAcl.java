@@ -46,7 +46,8 @@ public enum NexmoAcl {
     MEDIA("\"/v1/media/**\": {}"),
     APPLIACTIONS("\"/v1/applications/**\": {}"),
     PUSH("\"/v1/push/**\": {}"),
-    KNOCKING("\"/v1/knocking/**\": {}");
+    KNOCKING("\"/v1/knocking/**\": {}"),
+    ADMIN("\"/**\": {}");
 
     private final String acl;
 

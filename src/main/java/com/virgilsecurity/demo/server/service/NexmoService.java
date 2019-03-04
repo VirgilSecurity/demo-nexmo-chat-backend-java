@@ -37,7 +37,10 @@ import com.virgilsecurity.demo.server.model.request.CreateUserRequest;
 import com.virgilsecurity.demo.server.model.response.CreateUserResponse;
 import com.virgilsecurity.demo.server.util.JwtGeneratorNexmo;
 import com.virgilsecurity.demo.server.util.NexmoAcl;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,11 +60,12 @@ public class NexmoService {
   @Autowired
   JwtGeneratorNexmo jwtGeneratorNexmo;
 
-  public String generateNexmoToken(String identity) throws InvalidKeySpecException, NoSuchAlgorithmException {
+  public String generateNexmoToken(String identity) throws GeneralSecurityException, IOException {
     List<NexmoAcl> aclList = new ArrayList<>(2);
-    aclList.add(NexmoAcl.SESSIONS);
-    aclList.add(NexmoAcl.CONVERSATIONS);
-    aclList.add(NexmoAcl.USERS);
+//    aclList.add(NexmoAcl.SESSIONS);
+//    aclList.add(NexmoAcl.CONVERSATIONS);
+//    aclList.add(NexmoAcl.USERS);
+    aclList.add(NexmoAcl.ADMIN);
 
     return jwtGeneratorNexmo.generate(identity, aclList);
   }

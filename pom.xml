@@ -81,13 +81,6 @@
 			<artifactId>sdk</artifactId>
 			<version>5.0.5</version>
 		</dependency>
-
-		<!-- JWT Generation -->
-		<dependency>
-			<groupId>com.auth0</groupId>
-			<artifactId>java-jwt</artifactId>
-			<version>3.7.0</version>
-		</dependency>
 	</dependencies>
 
 	<build>
