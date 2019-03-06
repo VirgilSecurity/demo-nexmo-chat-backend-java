@@ -33,18 +33,17 @@
 
 package com.virgilsecurity.demo.server.service;
 
+import com.virgilsecurity.demo.server.model.jwt.NexmoAcl;
 import com.virgilsecurity.demo.server.model.request.CreateUserRequest;
 import com.virgilsecurity.demo.server.model.response.CreateUserResponse;
 import com.virgilsecurity.demo.server.util.JwtGeneratorNexmo;
-import com.virgilsecurity.demo.server.util.NexmoAcl;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -69,10 +68,17 @@ public class NexmoService {
     return jwtGeneratorNexmo.generate(identity, aclList);
   }
 
-  public CreateUserResponse createUser(String name, String displayName) {
-    CreateUserRequest newEmployee = new CreateUserRequest(name, displayName);
+  public CreateUserResponse createUser(String name,
+                                       String displayName) throws GeneralSecurityException, IOException {
+    String token = jwtGeneratorNexmo.generateAdminToken();
     RestTemplate restTemplate = new RestTemplate();
 
-    return restTemplate.postForObject(BASE_URL + USERS, newEmployee, CreateUserResponse.class);
+    HttpHeaders headersCreateUser = new HttpHeaders();
+    headersCreateUser.add("Authorization", "Bearer " + token);
+    CreateUserRequest createUserRequest = new CreateUserRequest(name, displayName);
+    HttpEntity<CreateUserRequest> requestEntityCreateUser = new HttpEntity<>(createUserRequest,
+                                                                             headersCreateUser);
+
+    return restTemplate.postForObject(BASE_URL + USERS, requestEntityCreateUser, CreateUserResponse.class);
   }
 }

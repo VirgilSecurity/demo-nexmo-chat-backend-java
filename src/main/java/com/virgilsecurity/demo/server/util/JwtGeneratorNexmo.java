@@ -33,6 +33,7 @@
 
 package com.virgilsecurity.demo.server.util;
 
+import com.virgilsecurity.demo.server.model.jwt.NexmoAcl;
 import com.virgilsecurity.sdk.common.TimeSpan;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -98,6 +99,41 @@ public class JwtGeneratorNexmo {
             "\"" + ISSUED_AT + "\":" + issuedAt + "," +
             "\"" + JWT_ID + "\":\"" + UUID.randomUUID().toString() + "\"," +
             "\"" + SUBJECT + "\":\"" + identity + "\"," +
+            "\"" + EXPIRATION + "\": " + expiresAt + "," +
+                aclBuilder.toString() +
+            "\"" + APP_ID + "\":\"" + appId + "\"" +
+                "}";
+
+        String headerEncoded = Base64.encodeBase64URLSafeString(headerJson.getBytes());
+        String payloadEncoded = Base64.encodeBase64URLSafeString(payloadJson.getBytes());
+
+        RSAPrivateKey privateKey = KeyUtils.getPrivateKey(secretKeyPath);
+        String signature = KeyUtils.sign(privateKey, headerEncoded + "." + payloadEncoded);
+
+        return String.format("%s.%s.%s", headerEncoded, payloadEncoded, signature);
+    }
+
+    public String generateAdminToken() throws GeneralSecurityException, IOException {
+        long nowMillis = System.currentTimeMillis();
+        Date now = new Date(nowMillis);
+        String issuedAt = String.valueOf(now.getTime() / 1000);
+        String expiresAt = String.valueOf((now.getTime() / 1000) + ttl.getSpanSeconds());
+
+        StringBuilder aclBuilder = new StringBuilder();
+        aclBuilder.append("\"" + ACL + "\":{");
+        aclBuilder.append("\"" + PATHS + "\":{");
+        aclBuilder.append(NexmoAcl.ADMIN.toString());
+        aclBuilder.append("}");
+        aclBuilder.append("},");
+
+        String headerJson = "{" +
+            "\"" + TYPE + "\":\"" + TYPE_JWT + "\"," +
+            "\"" + ALGORITHM + "\":\"" + ALGORITHM_RS256 + "\"" +
+                "}";
+
+        String payloadJson = "{" +
+            "\"" + ISSUED_AT + "\":" + issuedAt + "," +
+            "\"" + JWT_ID + "\":\"" + UUID.randomUUID().toString() + "\"," +
             "\"" + EXPIRATION + "\": " + expiresAt + "," +
                 aclBuilder.toString() +
             "\"" + APP_ID + "\":\"" + appId + "\"" +

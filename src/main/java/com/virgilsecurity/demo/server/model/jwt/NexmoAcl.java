@@ -31,7 +31,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.virgilsecurity.demo.server.util;
+package com.virgilsecurity.demo.server.model.jwt;
 
 /**
  * NexmoAcl class.

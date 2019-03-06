@@ -33,31 +33,28 @@
 
 package com.virgilsecurity.demo.server.model.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * AuthRequest class.
  */
 public class CreateUserResponse {
 
-  private String name;
+  private String id;
 
-  @JsonProperty("display_name")
-  private String displayName;
+  private String href;
 
   public CreateUserResponse() {
   }
 
-  public CreateUserResponse(String name, String displayName) {
-    this.name = name;
-    this.displayName = displayName;
+  public CreateUserResponse(String id, String href) {
+    this.id = id;
+    this.href = href;
   }
 
-  public String getName() {
-    return name;
+  public String getId() {
+    return id;
   }
 
-  public String getDisplayName() {
-    return displayName;
+  public String getHref() {
+    return href;
   }
 }

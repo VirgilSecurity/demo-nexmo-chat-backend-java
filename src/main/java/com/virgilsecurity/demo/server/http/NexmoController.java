@@ -41,9 +41,6 @@ import com.virgilsecurity.demo.server.service.NexmoService;
 import com.virgilsecurity.demo.server.util.JwtVerifierNexmo;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.spec.InvalidKeySpecException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -84,7 +81,8 @@ public class NexmoController {
 
     @PostMapping
     @RequestMapping("/users/create")
-    public ResponseEntity<CreateUserResponse> createUser(@RequestBody CreateUserRequest authRequest) {
+    public ResponseEntity<CreateUserResponse> createUser(
+        @RequestBody CreateUserRequest authRequest) throws GeneralSecurityException, IOException {
         CreateUserResponse response = nexmoService.createUser(authRequest.getName(),
                                                                authRequest.getDisplayName());
         return new ResponseEntity<>(response, HttpStatus.OK);

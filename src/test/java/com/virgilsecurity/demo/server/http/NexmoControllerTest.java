@@ -176,6 +176,6 @@ public class NexmoControllerTest {
         assertEquals(200, responseCreateUser.getStatusCodeValue());
         CreateUserResponse createUserResult = responseCreateUser.getBody();
         assertNotNull(createUserResult);
-        assertEquals(username, createUserResult.getName());
+        assertEquals(username, createUserResult.getId());
     }
 }
