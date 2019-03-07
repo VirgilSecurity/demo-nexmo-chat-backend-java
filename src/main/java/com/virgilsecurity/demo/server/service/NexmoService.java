@@ -63,7 +63,6 @@ public class NexmoService {
     List<NexmoAcl> aclList = new ArrayList<>(2);
     aclList.add(NexmoAcl.SESSIONS);
     aclList.add(NexmoAcl.CONVERSATIONS);
-    aclList.add(NexmoAcl.USERS);
 
     return jwtGeneratorNexmo.generate(identity, aclList);
   }
