@@ -1,24 +1,25 @@
 # Sample Java Backend for Nexmo
 
-This repository contains a sample backend code that demonstrates how to generate a Nexmo and Virgil JWTs using the [Java/Android SDK](https://github.com/VirgilSecurity/virgil-sdk-java-android)
+This repository contains a sample backend code that demonstrates how to generate a Virgil JWT using the [Java/Android SDK](https://github.com/VirgilSecurity/virgil-sdk-java-android)
 
 > Do not use this authentication in production. Requests to a /virgil-jwt endpoint must be allowed for authenticated users. Use your application authorization strategy.
 
 ## Prerequisites
 * Java Development Kit (JDK) 8+
 
-For IntelliJ IDEA run:
-* IntelliJ IDEA 2018.3.3+
+For IntelliJ IDEA Ultimate run:
+* IntelliJ IDEA Ultimate 2018.3.3+
+> If you have Community version of IDEA - go to `Building a Jar` section.
 
 For building a jar:
 * Maven 3+
 
-## IntelliJ IDEA run
-- git clone https://github.com/VirgilSecurity/sample-backend-java-nexmo
-- Open IntelliJ IDEA -> File -> New -> Project from Existing Sources, locate `sample-backend-java-nexmo` and click `open`
+## IntelliJ IDEA Ultimate run
+- git clone https://github.com/VirgilSecurity/demo-nexmo-chat-backend-java
+- Open IntelliJ IDEA -> File -> New -> Project from Existing Sources, locate `demo-nexmo-chat-backend-java` and click `open`
 - Select `Import project from external model` -> `Maven`, go `next` till `Please select project SDK` page
 - Select in list of available JDKs `1.8.xxx` version or greater. If you haven't JDK of `1.8.xxx` version [install](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) it. `Finish` setup.
-- Fill in your [credentials](#get-virgil-credentials) into the `sample-backend-java-nexmo/src/main/resources/`[`application.properties`](https://github.com/VirgilSecurity/sample-backend-java-nexmo/blob/master/src/main/resources/application.properties) file.
+- Fill in your [credentials](#get-virgil-credentials) into the `demo-nexmo-chat-backend-java/src/main/resources/`[`application.properties`](https://github.com/VirgilSecurity/demo-nexmo-chat-backend-java/blob/master/src/main/resources/application.properties) file.
 - Run application
 
 If server started successfully you will see in the end of logs:
@@ -41,6 +42,19 @@ To generate a JWT the following values are required:
 | virgil.api.private_key            | Private key of your API key that is used to sign the JWTs. |
 | virgil.api.key_id                 | ID of your API key. A unique string value that identifies your account in the Virgil Cloud. |
 
+- Replace credentials in [`application.properties`](https://github.com/VirgilSecurity/demo-nexmo-chat-backend-java/blob/master/src/main/resources/application.properties) with yours.
+
+## Get Nexmo Credentials
+
+ - Register on https://developer.nexmo.com/
+ - [Create Nexmo Application](https://developer.nexmo.com/tutorials/client-sdk-generate-test-credentials#create-a-nexmo-application) and remember your generated `private.key` path
+ - Replace the <YOUR_APP_ID> in [`application.properties`](https://github.com/VirgilSecurity/demo-nexmo-chat-backend-java/blob/master/src/main/resources/application.properties) with your `app id` from the created app above:
+ ```bash
+ Application created: aaaaaaaa-bbbb-cccc-dddd-0123456789ab
+ ```
+ - Rename your Nexmo `private.key` to `virgilnexmodemo_private.key`
+ - Put it near `application.properties` file to the [resourses folder](https://github.com/VirgilSecurity/demo-nexmo-chat-backend-java/blob/master/src/main/resources/)
+
 ## Building a Jar
 
 Possibly, you want to build a Jar to deploy it on a remote server (e.g. [Now](https://zeit.co/now), [Heroku](https://www.heroku.com/)).
@@ -60,13 +74,6 @@ $ mvn clean package -DskipTests
 ```
 
 JAR file will be build in `target` directory.
-
-### Add Virgil Credentials to *application.properties*
-
-- open `target` directory at the project folder
-- create a `application.properties` file
-- fill it with your account credentials (take a look at the [`application.properties`](https://github.com/VirgilSecurity/sample-backend-java-nexmo/blob/master/src/main/resources/application.properties) file to find out how to setup your own `application.properties` file)
-- save the `application.properties` file
 
 ### Run the Server
 
@@ -92,7 +99,7 @@ The response should looks like:
 
 ## Specification
 
-### /authenticate endpoint
+### /auth/authenticate endpoint
 This endpoint is an example of users authentication. It takes user `identity` and responds with unique token.
 
 ```http
@@ -110,7 +117,7 @@ Response:
 }
 ```
 
-### /virgil-jwt endpoint
+### /auth/virgil-jwt endpoint
 This endpoint checks whether a user is authorized by an authorization header. It takes user's `authToken`, finds related user identity and generates a `virgilToken` (which is [JSON Web Token](https://jwt.io/)) with this `identity` in a payload. Use this token to make authorized api calls to Virgil Cloud.
 
 ```http
@@ -125,7 +132,7 @@ Response:
 }
 ```
 
-### /nexmo-jwt endpoint
+### /auth/nexmo-jwt endpoint
 This endpoint checks whether a user is authorized by an authorization header. It takes user's `authToken`, finds related user identity and generates a `nexmoToken` (which is [JSON Web Token](https://jwt.io/)) with this `identity` in a payload. Use this token to make authorized api calls to Nexmo services. 
 > Current implementation provides only `/v1/sessions/**` and `/v1/conversations/**` ACLs (It's enough for text chat). You can modify this server to suit your needs for example passing ACLs as a query parameters to GET request and then add requested ACLs to you JWT. 
 
@@ -138,6 +145,27 @@ Response:
 
 {
     "nexmoToken": "string"
+}
+```
+
+### /users/create endpoint
+This endpoint checks whether a user is authorized by an authorization header. It [creates a user](https://developer.nexmo.com/api/conversation#createUser) on the `Nexmo` service and returns user's `id` and `reference`.
+
+```http
+POST https://localhost:3000/authenticate HTTP/1.1
+Content-type: application/json;
+Authorization: Bearer <authToken>
+
+{
+    "name": "string",
+    "display_name": "string"
+}
+
+Response:
+
+{
+    "id": "string",
+    "href": "string"
 }
 ```
 
