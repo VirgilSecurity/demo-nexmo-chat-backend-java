@@ -49,6 +49,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 
 /**
  * NexmoController class.
@@ -83,8 +84,16 @@ public class NexmoController {
     @RequestMapping("/users/create")
     public ResponseEntity<CreateUserResponse> createUser(
         @RequestBody CreateUserRequest authRequest) throws GeneralSecurityException, IOException {
-        CreateUserResponse response = nexmoService.createUser(authRequest.getName(),
-                                                               authRequest.getDisplayName());
+        CreateUserResponse response;
+        try {
+            response = nexmoService.createUser(authRequest.getName(),
+                                               authRequest.getDisplayName());
+        } catch (HttpClientErrorException exception) {
+            if (exception.getStatusCode().value() == HttpStatus.BAD_REQUEST.value())
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            else
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
