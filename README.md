@@ -77,8 +77,10 @@ JAR file will be build in `target` directory.
 
 ### Run the Server
 
+Run this command from the project's root folder:
+
 ```
-$ java -jar server.jar
+$ java -jar target/server.jar
 ```
 
 Now, use your client code to make a request to get a JWT from the sample backend that is working on http://localhost:3000.
