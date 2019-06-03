@@ -34,7 +34,10 @@ If server started successfully you will see in the end of logs:
 
 If you don't have an account yet, [sign up for one](https://dashboard.virgilsecurity.com/signup) using your e-mail.
 
-To generate a JWT the following values are required:
+- Create new E2EEv5 application;
+- Create new API Key and copy given private key;
+
+To generate a JWT the following values are required from the steps above:
 
 | Variable Name                     | Description                    |
 |-----------------------------------|--------------------------------|
