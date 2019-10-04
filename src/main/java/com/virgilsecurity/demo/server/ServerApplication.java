@@ -59,10 +59,10 @@ public class ServerApplication {
     @Value("${virgil.app.id}")
     String appId;
 
-    @Value("${virgil.api.private_key}")
+    @Value("${virgil.app.private_key}")
     String apiKey;
 
-    @Value("${virgil.api.public_key_id}")
+    @Value("${virgil.app.public_key_id}")
     String apiKeyIdentifier;
 
     @Value("${nexmo.api.app_id}")
